@@ -11,7 +11,7 @@ the more it's used — recursive self-improvement you can graph.
 ## The result
 
 Same memory bank, same tasks, same agent. The only difference is whether recall **learns from
-outcomes**. Mnemo climbs from 40% → 90%; a plain-similarity index (RAG) stays flat at 40%.
+outcomes**. Verified on **MongoDB Atlas Vector Search**: Mnemo climbs from 30% → 80% over the rounds; a plain-similarity index (RAG) stays flat at 40%.
 
 ![curve](results/curve.png)
 

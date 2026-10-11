@@ -22,6 +22,7 @@ from agent import solve                           # noqa: E402
 
 def run(use_usefulness, rounds, k, store_factory, label, bank, bank_vecs, eval_tasks, eval_vecs):
     store = store_factory()
+    store.clear()                                   # fresh collection per run
     for b, v in zip(bank, bank_vecs):
         store.add({**b, "vec": list(v), "uses": 0, "helped": 0, "usefulness": 0.5})
     from concurrent.futures import ThreadPoolExecutor

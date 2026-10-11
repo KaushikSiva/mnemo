@@ -50,6 +50,9 @@ class LocalStore:
     def replace_all(self, docs):
         self.docs = docs
 
+    def clear(self):
+        self.docs = []
+
 
 class AtlasStore:
     """MongoDB Atlas vector store. Memories persist in a collection; recall uses $vectorSearch."""
@@ -72,6 +75,9 @@ class AtlasStore:
 
     def all(self):
         return list(self.col.find({}))
+
+    def clear(self):
+        self.col.delete_many({})
 
     def update_stats(self, _id, uses, helped, usefulness):
         self.col.update_one({"_id": _id}, {"$set": {"uses": uses, "helped": helped, "usefulness": usefulness}})
