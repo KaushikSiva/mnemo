@@ -13,7 +13,18 @@ the more it's used — recursive self-improvement you can graph.
 Same memory bank, same tasks, same agent. The only difference is whether recall **learns from
 outcomes**. Verified on **MongoDB Atlas Vector Search**: Mnemo climbs from 30% → 80% over the rounds; a plain-similarity index (RAG) stays flat at 40%.
 
-![curve](results/curve.png)
+![curve](docs/curve.png)
+
+## Visualizing the self-improvement
+
+You can watch the memory sort itself out. As Mnemo learns from outcomes, the **correct memories
+light up** (high usefulness) and the **noisy ones fade** — round by round, no retraining:
+
+![memory self-organizing](docs/viz_memory.png)
+
+The loop that drives it — recall → act → learn what helped → forget the noise → **better recall every pass**:
+
+<p align="center"><img width="420" src="docs/viz_loop.png"></p>
 
 ## How it works
 

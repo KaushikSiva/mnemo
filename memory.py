@@ -93,12 +93,21 @@ class Memory:
         self.store = store
         self.alpha = alpha                 # how hard usefulness bends the ranking
         self.use_usefulness = use_usefulness   # False = ablation (plain similarity, i.e. RAG)
+        self.stats = {}                    # authoritative in-process usefulness (Atlas' search index
+                                           # is eventually consistent, so we don't trust it for reranking)
+
+    def _key(self, d):
+        return str(d["_id"]) if "_id" in d else id(d)
+
+    def _useful(self, d):
+        s = self.stats.get(self._key(d))
+        return s["usefulness"] if s else d.get("usefulness", 0.5)
 
     def retrieve(self, qvec, k=3, pool=24):
         cands = self.store.search(qvec, pool)
         scored = []
         for doc, sim in cands:
-            u = doc.get("usefulness", 0.5)
+            u = self._useful(doc)
             score = sim * (1 + self.alpha * u) if self.use_usefulness else sim
             scored.append((score, doc))
         scored.sort(key=lambda x: -x[0])
@@ -115,12 +124,16 @@ class Memory:
     def record(self, used_docs, success):
         """The core learning step: did recalling these memories lead to success?"""
         for d in used_docs:
-            d["uses"] = d.get("uses", 0) + 1
+            k = self._key(d)
+            st = self.stats.setdefault(k, {"uses": d.get("uses", 0), "helped": d.get("helped", 0),
+                                           "usefulness": d.get("usefulness", 0.5)})
+            st["uses"] += 1
             if success:
-                d["helped"] = d.get("helped", 0) + 1
-            d["usefulness"] = (d["helped"] + 1) / (d["uses"] + 2)   # smoothed success rate
-            if isinstance(self.store, AtlasStore) and "_id" in d:
-                self.store.update_stats(d["_id"], d["uses"], d["helped"], d["usefulness"])
+                st["helped"] += 1
+            st["usefulness"] = (st["helped"] + 1) / (st["uses"] + 2)   # smoothed success rate
+            d["uses"], d["helped"], d["usefulness"] = st["uses"], st["helped"], st["usefulness"]
+            if isinstance(self.store, AtlasStore) and "_id" in d:      # persist for inspection/durability
+                self.store.update_stats(d["_id"], st["uses"], st["helped"], st["usefulness"])
 
     def prune(self, min_uses=2, min_usefulness=0.35):
         """Forget memories that have been tried enough and keep misleading."""
