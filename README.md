@@ -26,6 +26,19 @@ The loop that drives it — recall → act → learn what helped → forget the 
 
 <p align="center"><img width="420" src="docs/viz_loop.png"></p>
 
+## Real-world demo: RouteMind 🚗
+
+The same engine, on real roads. A car learns to drive from **Kodambakkam railway station** to
+**Jains Antariksha** (Chennai) — real OpenStreetMap streets and turns. Its memory of turns starts
+noisy, so it gets lost; trip by trip it learns which turns actually get it there. **It arrives by
+trip 6; a frozen-memory baseline never gets past the first turn.**
+
+| Trip 1 — lost at the first turn | Trip 6 — arrives |
+|---|---|
+| ![lost](docs/routemind_lost.png) | ![arrived](docs/routemind_arrived.png) |
+
+→ **[github.com/KaushikSiva/routemind](https://github.com/KaushikSiva/routemind)**
+
 ## How it works
 
 ```
